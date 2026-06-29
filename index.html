@@ -1,34 +1,800 @@
-Example ACBA-primary
-VFI CBA Explorer
-Canterbury Rural Nitrate Survey · Study-level economic evaluation
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VFI CBA Explorer — Canterbury Rural Nitrate Survey</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-NZ Treasury CBAx · Julian King VFI Framework · NZ QALY benchmark $45k
+    :root {
+      --surface-0: #f4f3ef;
+      --surface-1: #f0efeb;
+      --surface-2: #ffffff;
+      --text-primary: #0b0b0b;
+      --text-secondary: #52514e;
+      --text-muted: #898781;
+      --border: rgba(11,11,11,0.10);
+      --border-strong: rgba(11,11,11,0.18);
+      --bg-accent: #e6f1fb;
+      --text-accent: #185fa5;
+      --border-accent: #85b7eb;
+      --bg-success: #eaf3de;
+      --text-success: #3b6d11;
+      --radius: 8px;
+      --font-sans: system-ui, -apple-system, sans-serif;
+    }
 
-yoursudesh
-Overview
-CBA model
-Sensitivity
-VFI rubric
-STUDY PARAMETERS
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface-0: #111110;
+        --surface-1: #1a1a19;
+        --surface-2: #242423;
+        --text-primary: #ffffff;
+        --text-secondary: #c3c2b7;
+        --text-muted: #898781;
+        --border: rgba(255,255,255,0.10);
+        --border-strong: rgba(255,255,255,0.18);
+        --bg-accent: #042c53;
+        --text-accent: #85b7eb;
+        --border-accent: #185fa5;
+        --bg-success: #173404;
+        --text-success: #97c459;
+      }
+    }
 
-Study cost	$76,000
-Households surveyed	320
-Notified above-standard	90 households
-Protective action taken	47 households (52%)
-Discount rate	6% (NZ Treasury CBAx)
-QALY benchmark	$45,000 / QALY (NZ)
-Time horizon	10 years
-BENEFIT STREAMS
+    body {
+      font-family: var(--font-sans);
+      background: var(--surface-0);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0;
+    }
 
-Stream 1 — Acute infant risk	Methaemoglobinaemia cases averted in households with infants under 6 months
-Stream 2 — Chronic adult risk	Colorectal cancer incidence reduction over 10-year horizon
-This study is evaluated as Good on cost-effectiveness. The two benefit streams together produce a positive NPV and BCR above 1.0 under base-case assumptions, indicating the $76,000 investment generates net health value for the rural Canterbury community. Use the CBA model tab to adjust key parameters and explore how results change.
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
 
-FRAMEWORK
+    /* ── Header ── */
+    .site-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .site-header h1 {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .site-header p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .header-link {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .header-link:hover { color: var(--text-accent); }
 
-Economic method	Cost-benefit analysis (CBAx — NZ Treasury guidance)
-Evaluation framework	Julian King Value for Investment (VFI) 2017–2024
-Evaluation criteria	Five Es — Economy, Efficiency, Effectiveness, Cost-effectiveness, Equity
-Equity framing	Te Tiriti o Waitangi obligations; Māori and Pacific distributional analysis recommended
-VFI CBA Explorer · Personal demo · yoursudesh
-Julian King VFI Framework · NZ Treasury CBAx · NZ QALY $45k
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: var(--radius);
+      background: var(--bg-accent);
+      color: var(--text-accent);
+      margin-right: 6px;
+      margin-bottom: 10px;
+    }
+    .badge-success {
+      background: var(--bg-success);
+      color: var(--text-success);
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 1.75rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .tab {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      padding: 9px 16px;
+      cursor: pointer;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -0.5px;
+      background: none;
+      transition: color 0.12s;
+    }
+    .tab.active {
+      color: var(--text-primary);
+      font-weight: 500;
+      border-bottom-color: var(--text-primary);
+    }
+    .tab:hover:not(.active) { color: var(--text-primary); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+    }
+
+    /* ── Metric cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.75rem;
+    }
+    .metric-card {
+      background: var(--surface-1);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+    .metric-value {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .metric-value.green { color: #1baf7a; }
+    .metric-value.red   { color: #e34948; }
+    .metric-value.amber { color: #eda100; }
+    .metric-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* ── Info table ── */
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 1.75rem;
+    }
+    .info-table td {
+      padding: 9px 0;
+      border-bottom: 0.5px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .info-table td:first-child {
+      color: var(--text-primary);
+      font-weight: 500;
+      width: 52%;
+      padding-right: 1rem;
+    }
+    .info-table tr:last-child td { border-bottom: none; }
+
+    /* ── Sliders ── */
+    .slider-group { margin-bottom: 1.25rem; }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .slider-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      width: 230px;
+      flex-shrink: 0;
+    }
+    .slider-row input[type=range] { flex: 1; }
+    .slider-val {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      width: 80px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 0.5px solid var(--border);
+      margin: 1.75rem 0;
+    }
+
+    /* ── Charts ── */
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      margin-bottom: 1.75rem;
+    }
+
+    /* ── Rubric ── */
+    .rubric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.75rem;
+    }
+    .rubric-card {
+      background: var(--surface-1);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      border-left: 3px solid transparent;
+    }
+    .rubric-card.excellent { border-left-color: #1baf7a; }
+    .rubric-card.good      { border-left-color: #2a78d6; }
+    .rubric-card.adequate  { border-left-color: #eda100; }
+    .rubric-card.poor      { border-left-color: #e34948; }
+    .rubric-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+    .rubric-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ── Judgement box ── */
+    .judgement-box {
+      background: var(--surface-1);
+      border-radius: 12px;
+      border: 0.5px solid var(--border);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .judgement-box p {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.75;
+    }
+    .judgement-standard { font-weight: 500; }
+    .standard-excellent { color: #1baf7a; }
+    .standard-good      { color: #2a78d6; }
+    .standard-adequate  { color: #eda100; }
+    .standard-poor      { color: #e34948; }
+
+    /* ── Ask button ── */
+    .ask-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-accent);
+      background: var(--bg-accent);
+      border: 0.5px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 8px 14px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      text-decoration: none;
+    }
+    .ask-btn:hover { opacity: 0.85; }
+
+    /* ── Footer ── */
+    .site-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 0.5px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .site-footer a { color: var(--text-muted); text-decoration: none; }
+    .site-footer a:hover { color: var(--text-accent); }
+
+    @media (max-width: 560px) {
+      .rubric-grid { grid-template-columns: 1fr; }
+      .slider-label { width: 160px; font-size: 12px; }
+      .cards { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="site-header">
+    <div>
+      <span class="badge">Example A</span><span class="badge badge-success">CBA-primary</span>
+      <h1>VFI CBA Explorer</h1>
+      <p>Canterbury Rural Nitrate Survey · Study-level economic evaluation</p>
+      <p>NZ Treasury CBAx · Julian King VFI Framework · NZ QALY benchmark $45k</p>
+    </div>
+    <div style="text-align:right; flex-shrink:0; margin-left:1rem;">
+      <a class="header-link" href="https://github.com/yoursudesh/vfi-cba-explorer" target="_blank">
+        <i class="ti ti-brand-github" aria-hidden="true"></i> yoursudesh
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('overview')">Overview</button>
+    <button class="tab" onclick="switchTab('cba')">CBA model</button>
+    <button class="tab" onclick="switchTab('sensitivity')">Sensitivity</button>
+    <button class="tab" onclick="switchTab('rubric')">VFI rubric</button>
+  </div>
+
+  <!-- ══ OVERVIEW ══ -->
+  <div id="tab-overview" class="panel active">
+    <p class="section-label">Study parameters</p>
+    <table class="info-table">
+      <tr><td>Study cost</td><td>$76,000</td></tr>
+      <tr><td>Households surveyed</td><td>320</td></tr>
+      <tr><td>Notified above-standard</td><td>90 households</td></tr>
+      <tr><td>Protective action taken</td><td>47 households (52%)</td></tr>
+      <tr><td>Discount rate</td><td>6% (NZ Treasury CBAx)</td></tr>
+      <tr><td>QALY benchmark</td><td>$45,000 / QALY (NZ)</td></tr>
+      <tr><td>Time horizon</td><td>10 years</td></tr>
+    </table>
+    <p class="section-label">Benefit streams</p>
+    <table class="info-table">
+      <tr><td>Stream 1 — Acute infant risk</td><td>Methaemoglobinaemia cases averted in households with infants under 6 months</td></tr>
+      <tr><td>Stream 2 — Chronic adult risk</td><td>Colorectal cancer incidence reduction over 10-year horizon</td></tr>
+    </table>
+    <div class="judgement-box">
+      <p>This study is evaluated as <span class="judgement-standard standard-good">Good</span> on cost-effectiveness. The two benefit streams together produce a positive NPV and BCR above 1.0 under base-case assumptions, indicating the $76,000 investment generates net health value for the rural Canterbury community. Use the CBA model tab to adjust key parameters and explore how results change.</p>
+    </div>
+    <p class="section-label">Framework</p>
+    <table class="info-table">
+      <tr><td>Economic method</td><td>Cost-benefit analysis (CBAx — NZ Treasury guidance)</td></tr>
+      <tr><td>Evaluation framework</td><td>Julian King Value for Investment (VFI) 2017–2024</td></tr>
+      <tr><td>Evaluation criteria</td><td>Five Es — Economy, Efficiency, Effectiveness, Cost-effectiveness, Equity</td></tr>
+      <tr><td>Equity framing</td><td>Te Tiriti o Waitangi obligations; Māori and Pacific distributional analysis recommended</td></tr>
+    </table>
+  </div>
+
+  <!-- ══ CBA MODEL ══ -->
+  <div id="tab-cba" class="panel">
+    <p class="section-label">Adjust parameters</p>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">Study cost ($)</span>
+        <input type="range" min="40000" max="150000" step="1000" value="76000" id="sl-cost" oninput="calc()">
+        <span class="slider-val" id="sv-cost">$76,000</span>
+      </div>
+    </div>
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">Uptake rate (% taking protective action)</span>
+        <input type="range" min="10" max="90" step="1" value="52" id="sl-uptake" oninput="calc()">
+        <span class="slider-val" id="sv-uptake">52%</span>
+      </div>
+    </div>
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">QALY benchmark ($/QALY)</span>
+        <input type="range" min="20000" max="100000" step="1000" value="45000" id="sl-qaly" oninput="calc()">
+        <span class="slider-val" id="sv-qaly">$45,000</span>
+      </div>
+    </div>
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">Discount rate (%)</span>
+        <input type="range" min="2" max="10" step="0.5" value="6" id="sl-disc" oninput="calc()">
+        <span class="slider-val" id="sv-disc">6.0%</span>
+      </div>
+    </div>
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">Time horizon (years)</span>
+        <input type="range" min="5" max="20" step="1" value="10" id="sl-years" oninput="calc()">
+        <span class="slider-val" id="sv-years">10 yrs</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="section-label">Results</p>
+    <div class="cards">
+      <div class="metric-card">
+        <div class="metric-label">Total PV benefits</div>
+        <div class="metric-value" id="pv-benefits">—</div>
+        <div class="metric-sub">Discounted benefit streams</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Net present value</div>
+        <div class="metric-value" id="npv-val">—</div>
+        <div class="metric-sub">Benefits minus costs</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Benefit-cost ratio</div>
+        <div class="metric-value" id="bcr-val">—</div>
+        <div class="metric-sub">BCR &gt; 1.0 = positive</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">VFI standard</div>
+        <div class="metric-value" id="vfi-standard">—</div>
+        <div class="metric-sub" id="vfi-sub">—</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="section-label">Annual discounted benefits by stream</p>
+    <div class="legend-row">
+      <span class="legend-item"><span class="legend-swatch" style="background:#2a78d6"></span>Stream 1 — Acute infant (methaemoglobinaemia)</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:#1baf7a"></span>Stream 2 — Chronic adult CRC</span>
+    </div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="streamChart" role="img" aria-label="Stacked bar chart showing annual discounted benefits from two health benefit streams over the selected time horizon">Annual benefit streams by year</canvas>
+    </div>
+  </div>
+
+  <!-- ══ SENSITIVITY ══ -->
+  <div id="tab-sensitivity" class="panel">
+    <p class="section-label">Scenario comparison</p>
+    <div class="cards">
+      <div class="metric-card">
+        <div class="metric-label">Pessimistic BCR</div>
+        <div class="metric-value red" id="bcr-pess">—</div>
+        <div class="metric-sub">25% uptake · cost +30% · QALY −30% · disc +2%</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Base-case BCR</div>
+        <div class="metric-value" id="bcr-base2">—</div>
+        <div class="metric-sub">52% uptake · $76k · $45k QALY · 6%</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Optimistic BCR</div>
+        <div class="metric-value green" id="bcr-opt">—</div>
+        <div class="metric-sub">75% uptake · cost −20% · QALY +20% · disc −2%</div>
+      </div>
+    </div>
+    <div class="legend-row">
+      <span class="legend-item"><span class="legend-swatch" style="background:#e34948"></span>Pessimistic</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:#2a78d6"></span>Base case</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:#1baf7a"></span>Optimistic</span>
+    </div>
+    <div class="chart-wrap" style="height:260px">
+      <canvas id="sensitivityChart" role="img" aria-label="Bar chart comparing benefit-cost ratio across pessimistic, base, and optimistic scenarios">Scenario BCR comparison</canvas>
+    </div>
+
+    <hr class="divider">
+    <p class="section-label">Parameter sensitivity — what drives the BCR most?</p>
+    <div class="legend-row">
+      <span class="legend-item"><span class="legend-swatch" style="background:#e34948"></span>Low estimate</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:#1baf7a"></span>High estimate</span>
+    </div>
+    <div class="chart-wrap" style="height:240px">
+      <canvas id="tornadoChart" role="img" aria-label="Horizontal tornado chart showing how sensitive the BCR is to each parameter individually">Tornado chart — BCR sensitivity by parameter</canvas>
+    </div>
+    <div class="judgement-box" style="margin-top:1rem">
+      <p>Uptake rate and QALY benchmark are the two parameters that most influence the BCR. The discount rate has a moderate effect over a 10-year horizon. Study cost has the least influence, suggesting that even a cost overrun would not materially change the investment case under base-case benefit assumptions.</p>
+    </div>
+  </div>
+
+  <!-- ══ VFI RUBRIC ══ -->
+  <div id="tab-rubric" class="panel">
+    <p class="section-label">Five Es evaluation — study level</p>
+    <div class="rubric-grid">
+      <div class="rubric-card good">
+        <div class="rubric-title">Economy</div>
+        <div class="rubric-desc">Good. Inputs were efficiently sourced; community mobilisation leveraged existing regional networks at low marginal cost. No evidence of over-resourcing relative to study scope.</div>
+      </div>
+      <div class="rubric-card excellent">
+        <div class="rubric-title">Efficiency</div>
+        <div class="rubric-desc">Excellent. 320 households surveyed within budget. Water testing and community notification integrated into a single fieldwork round, minimising duplication.</div>
+      </div>
+      <div class="rubric-card good">
+        <div class="rubric-title">Effectiveness</div>
+        <div class="rubric-desc">Good. 52% uptake of protective action among notified households is above the sector average for environmental health interventions of this type.</div>
+      </div>
+      <div class="rubric-card good" id="rubric-ce">
+        <div class="rubric-title">Cost-effectiveness</div>
+        <div class="rubric-desc" id="rubric-ce-desc">Good. BCR above 1.0 under base-case assumptions. Both benefit streams contribute positively. The chronic CRC stream drives most long-run value.</div>
+      </div>
+      <div class="rubric-card adequate" style="grid-column: 1 / -1;">
+        <div class="rubric-title">Equity</div>
+        <div class="rubric-desc">Adequate. The survey targeted a geographically defined community, not a population-stratified sample. Māori and Pacific household exposure was not separately analysed. A follow-up distributional analysis stratified by ethnicity and household income is recommended for future iterations. Te Tiriti obligations require that equity impacts on Māori be explicitly considered in study design.</div>
+      </div>
+    </div>
+
+    <p class="section-label">Evaluative judgement</p>
+    <div class="judgement-box">
+      <p id="judgement-text">This investment is <span class="judgement-standard standard-good">Good</span> on cost-effectiveness (Five Es criterion 4). The discounted benefits across both health outcome streams exceed the $76,000 study cost under base-case assumptions, producing a positive NPV and BCR above 1.0. To improve VFI, the study should commission a follow-up equity analysis stratified by ethnicity and household income, and establish a standardised method for quantifying the chronic colorectal cancer risk reduction benefit stream in future iterations of this study design.</p>
+    </div>
+
+    <p class="section-label">Overall VFI rating</p>
+    <div class="cards" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="metric-card" style="text-align:center">
+        <div class="metric-label">Economy</div>
+        <div class="metric-value" style="font-size:16px; color:#2a78d6">Good</div>
+      </div>
+      <div class="metric-card" style="text-align:center">
+        <div class="metric-label">Efficiency</div>
+        <div class="metric-value" style="font-size:16px; color:#1baf7a">Excellent</div>
+      </div>
+      <div class="metric-card" style="text-align:center">
+        <div class="metric-label">Effectiveness</div>
+        <div class="metric-value" style="font-size:16px; color:#2a78d6">Good</div>
+      </div>
+      <div class="metric-card" style="text-align:center" id="overall-ce-card">
+        <div class="metric-label">Cost-eff.</div>
+        <div class="metric-value" style="font-size:16px;" id="overall-ce-val">Good</div>
+      </div>
+      <div class="metric-card" style="text-align:center">
+        <div class="metric-label">Equity</div>
+        <div class="metric-value" style="font-size:16px; color:#eda100">Adequate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="site-footer">
+    <span>VFI CBA Explorer · Personal demo · <a href="https://github.com/yoursudesh" target="_blank">yoursudesh</a></span>
+    <span>Julian King VFI Framework · NZ Treasury CBAx · NZ QALY $45k</span>
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  let streamChartInst, sensitivityChartInst, tornadoChartInst;
+
+  function fmt(n) {
+    if (Math.abs(n) >= 1000000) return '$' + (n / 1000000).toFixed(2) + 'M';
+    if (Math.abs(n) >= 1000)    return '$' + Math.round(n / 1000) + 'k';
+    return '$' + Math.round(n);
+  }
+
+  function calcBCR(uptakePct, cost, qalyVal, disc, years) {
+    const notified       = 90;
+    const hh_act         = notified * (uptakePct / 100);
+    const infants_per_hh = 0.06;
+    const p_methAverted  = 0.15;
+    const methQALY       = 0.08;
+    const stream1_annual = hh_act * infants_per_hh * p_methAverted * methQALY * qalyVal;
+
+    const adults_per_hh  = 1.8;
+    const rr_reduction   = 0.04;
+    const crc_qaly       = 1.2;
+    const crc_prob_10yr  = 0.008;
+    const stream2_annual = hh_act * adults_per_hh * crc_prob_10yr * rr_reduction * crc_qaly * qalyVal / years;
+
+    let pvB = 0, s1arr = [], s2arr = [];
+    for (let y = 1; y <= years; y++) {
+      const df = 1 / Math.pow(1 + disc / 100, y);
+      s1arr.push(parseFloat((stream1_annual * df).toFixed(0)));
+      s2arr.push(parseFloat((stream2_annual * df).toFixed(0)));
+      pvB += (stream1_annual + stream2_annual) * df;
+    }
+    return { pvB, npv: pvB - cost, bcr: pvB / cost, s1arr, s2arr };
+  }
+
+  function getStandard(bcr) {
+    if (bcr >= 3)   return { label: 'Excellent', cls: 'standard-excellent', cardCls: 'excellent', color: '#1baf7a', sub: 'BCR ≥ 3.0' };
+    if (bcr >= 1.5) return { label: 'Good',      cls: 'standard-good',      cardCls: 'good',      color: '#2a78d6', sub: 'BCR 1.5–3.0' };
+    if (bcr >= 1.0) return { label: 'Adequate',  cls: 'standard-adequate',  cardCls: 'adequate',  color: '#eda100', sub: 'BCR 1.0–1.5' };
+    return             { label: 'Poor',      cls: 'standard-poor',      cardCls: 'poor',      color: '#e34948', sub: 'BCR < 1.0' };
+  }
+
+  function calc() {
+    const cost   = +document.getElementById('sl-cost').value;
+    const uptake = +document.getElementById('sl-uptake').value;
+    const qaly   = +document.getElementById('sl-qaly').value;
+    const disc   = +document.getElementById('sl-disc').value;
+    const years  = +document.getElementById('sl-years').value;
+
+    document.getElementById('sv-cost').textContent   = fmt(cost);
+    document.getElementById('sv-uptake').textContent = uptake + '%';
+    document.getElementById('sv-qaly').textContent   = fmt(qaly);
+    document.getElementById('sv-disc').textContent   = disc.toFixed(1) + '%';
+    document.getElementById('sv-years').textContent  = years + ' yrs';
+
+    const r   = calcBCR(uptake, cost, qaly, disc, years);
+    const std = getStandard(r.bcr);
+
+    document.getElementById('pv-benefits').textContent = fmt(r.pvB);
+
+    const npvEl = document.getElementById('npv-val');
+    npvEl.textContent  = fmt(r.npv);
+    npvEl.className    = 'metric-value ' + (r.npv >= 0 ? 'green' : 'red');
+
+    const bcrEl = document.getElementById('bcr-val');
+    bcrEl.textContent  = r.bcr.toFixed(2);
+    bcrEl.className    = 'metric-value ' + (r.bcr >= 1 ? 'green' : 'red');
+
+    const stdEl = document.getElementById('vfi-standard');
+    stdEl.textContent  = std.label;
+    stdEl.className    = 'metric-value ' + std.cls;
+    document.getElementById('vfi-sub').textContent = std.sub;
+
+    const labels = Array.from({ length: years }, (_, i) => 'Y' + (i + 1));
+    if (streamChartInst) {
+      streamChartInst.data.labels              = labels;
+      streamChartInst.data.datasets[0].data    = r.s1arr;
+      streamChartInst.data.datasets[1].data    = r.s2arr;
+      streamChartInst.update();
+    }
+
+    const bcrPess = calcBCR(25, cost * 1.3, qaly * 0.7, disc + 2,              years).bcr;
+    const bcrOpt  = calcBCR(75, cost * 0.8, qaly * 1.2, Math.max(2, disc - 2), years).bcr;
+
+    document.getElementById('bcr-pess').textContent  = bcrPess.toFixed(2);
+    document.getElementById('bcr-base2').textContent = r.bcr.toFixed(2);
+    document.getElementById('bcr-opt').textContent   = bcrOpt.toFixed(2);
+    document.getElementById('bcr-pess').className    = 'metric-value ' + (bcrPess >= 1 ? '' : 'red');
+    document.getElementById('bcr-base2').className   = 'metric-value ' + (r.bcr >= 1 ? 'green' : 'red');
+
+    if (sensitivityChartInst) {
+      sensitivityChartInst.data.datasets[0].data = [bcrPess, r.bcr, bcrOpt];
+      sensitivityChartInst.update();
+    }
+
+    const tornadoData = [
+      [calcBCR(25,  cost,       qaly,       disc,              years).bcr, calcBCR(75,  cost,       qaly,       disc,              years).bcr],
+      [calcBCR(uptake, cost, qaly * 0.7, disc, years).bcr,                 calcBCR(uptake, cost, qaly * 1.3, disc, years).bcr],
+      [calcBCR(uptake, cost, qaly, disc + 2,              years).bcr,      calcBCR(uptake, cost, qaly, Math.max(2, disc - 2), years).bcr],
+      [calcBCR(uptake, cost * 1.3, qaly, disc, years).bcr,                 calcBCR(uptake, cost * 0.7, qaly, disc, years).bcr],
+    ];
+    if (tornadoChartInst) {
+      tornadoChartInst.data.datasets[0].data = tornadoData.map(d => d[0]);
+      tornadoChartInst.data.datasets[1].data = tornadoData.map(d => d[1]);
+      tornadoChartInst.update();
+    }
+
+    const ceCard = document.getElementById('rubric-ce');
+    ceCard.className = 'rubric-card ' + std.cardCls;
+    const ceDescs = {
+      Excellent: 'Excellent. BCR well above 3.0 — exceptional health value relative to cost. Both benefit streams contribute strongly.',
+      Good:      'Good. BCR above 1.0 under base-case assumptions. Both benefit streams contribute positively. CRC stream drives most long-run value.',
+      Adequate:  'Adequate. BCR marginally above 1.0. Positive but sensitive to key assumptions. Sensitivity reporting is recommended.',
+      Poor:      'Poor. BCR below 1.0 under current assumptions. Net negative NPV — review uptake rate and benefit stream estimates.'
+    };
+    document.getElementById('rubric-ce-desc').textContent = ceDescs[std.label];
+
+    const overallCeVal = document.getElementById('overall-ce-val');
+    overallCeVal.textContent = std.label;
+    overallCeVal.style.color = std.color;
+  }
+
+  function initCharts() {
+    const years  = 10;
+    const labels = Array.from({ length: years }, (_, i) => 'Y' + (i + 1));
+    const r      = calcBCR(52, 76000, 45000, 6, years);
+
+    streamChartInst = new Chart(document.getElementById('streamChart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Stream 1', data: r.s1arr, backgroundColor: '#2a78d6', borderRadius: 4, stack: 'a' },
+          { label: 'Stream 2', data: r.s2arr, backgroundColor: '#1baf7a', borderRadius: 4, stack: 'a' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: '#898781' } },
+          y: { stacked: true, grid: { color: '#e1e0d9' }, ticks: { font: { size: 11 }, color: '#898781', callback: v => '$' + (v / 1000).toFixed(0) + 'k' } }
+        }
+      }
+    });
+
+    const bcrPess = calcBCR(25, 76000 * 1.3, 45000 * 0.7, 8, years).bcr;
+    const bcrOpt  = calcBCR(75, 76000 * 0.8, 45000 * 1.2, 4, years).bcr;
+
+    sensitivityChartInst = new Chart(document.getElementById('sensitivityChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Pessimistic', 'Base case', 'Optimistic'],
+        datasets: [{ data: [bcrPess, r.bcr, bcrOpt], backgroundColor: ['#e34948', '#2a78d6', '#1baf7a'], borderRadius: 4 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 12 }, color: '#898781' } },
+          y: { grid: { color: '#e1e0d9' }, ticks: { font: { size: 11 }, color: '#898781', callback: v => v.toFixed(1) }, title: { display: true, text: 'BCR', font: { size: 11 }, color: '#898781' } }
+        }
+      }
+    });
+
+    const td = [
+      [calcBCR(25,  76000,        45000,        6, years).bcr, calcBCR(75,  76000,        45000,        6, years).bcr],
+      [calcBCR(52,  76000,        45000 * 0.7,  6, years).bcr, calcBCR(52,  76000,        45000 * 1.3,  6, years).bcr],
+      [calcBCR(52,  76000,        45000,        8, years).bcr, calcBCR(52,  76000,        45000,        4, years).bcr],
+      [calcBCR(52,  76000 * 1.3,  45000,        6, years).bcr, calcBCR(52,  76000 * 0.7,  45000,        6, years).bcr],
+    ];
+
+    tornadoChartInst = new Chart(document.getElementById('tornadoChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Uptake rate', 'QALY benchmark', 'Discount rate', 'Study cost'],
+        datasets: [
+          { label: 'Low estimate',  data: td.map(d => d[0]), backgroundColor: '#e34948', borderRadius: 4 },
+          { label: 'High estimate', data: td.map(d => d[1]), backgroundColor: '#1baf7a', borderRadius: 4 }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#e1e0d9' }, ticks: { font: { size: 11 }, color: '#898781', callback: v => v.toFixed(1) }, title: { display: true, text: 'BCR', font: { size: 11 }, color: '#898781' } },
+          y: { grid: { display: false }, ticks: { font: { size: 12 }, color: '#898781' } }
+        }
+      }
+    });
+
+    document.getElementById('bcr-pess').textContent  = bcrPess.toFixed(2);
+    document.getElementById('bcr-base2').textContent = r.bcr.toFixed(2);
+    document.getElementById('bcr-opt').textContent   = bcrOpt.toFixed(2);
+    document.getElementById('bcr-pess').className    = 'metric-value ' + (bcrPess >= 1 ? '' : 'red');
+    document.getElementById('bcr-base2').className   = 'metric-value ' + (r.bcr >= 1 ? 'green' : 'red');
+    document.getElementById('pv-benefits').textContent = fmt(r.pvB);
+
+    const npvEl = document.getElementById('npv-val');
+    npvEl.textContent = fmt(r.npv);
+    npvEl.className   = 'metric-value ' + (r.npv >= 0 ? 'green' : 'red');
+
+    const bcrEl = document.getElementById('bcr-val');
+    bcrEl.textContent = r.bcr.toFixed(2);
+    bcrEl.className   = 'metric-value ' + (r.bcr >= 1 ? 'green' : 'red');
+
+    const std = getStandard(r.bcr);
+    const stdEl = document.getElementById('vfi-standard');
+    stdEl.textContent = std.label;
+    stdEl.className   = 'metric-value ' + std.cls;
+    document.getElementById('vfi-sub').textContent = std.sub;
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('.tab[onclick*="' + name + '"]').classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  window.addEventListener('load', initCharts);
+</script>
+</body>
+</html>
